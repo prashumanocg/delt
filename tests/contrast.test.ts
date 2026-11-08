@@ -9,7 +9,7 @@ const files = [...readFileSync("src/app/app.css", "utf8").matchAll(/@import "\.\
 const css = files.map((f) => readFileSync(`src/app/${f}`, "utf8")).join("\n");
 
 test("the styles are split into one file per look, in cascade order", () => {
-  assert.deepEqual(files, ["styles/base.css", "styles/look-shared.css", "styles/look-minimal.css", "styles/look-glyph.css", "styles/themes.css", "styles/look-grid.css"]);
+  assert.deepEqual(files, ["styles/base.css", "styles/look-shared.css", "styles/look-minimal.css", "styles/look-glyph.css", "styles/themes.css", "styles/look-grid.css", "styles/look-slate.css"]);
   assert.ok(!css.includes(":not([data-look"), "say which looks a rule is for, not which it isn't");
   assert.ok(!/data-look/.test(readFileSync("src/app/styles/base.css", "utf8")), "base.css has no look-specific rules");
 });

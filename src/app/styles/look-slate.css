@@ -1,0 +1,63 @@
+/* =========================================================
+   Slate: this fork's look (prashumanocg/delt). Not part of upstream DELT.
+
+   It refines Minimal's dark theme rather than adding a fourth layout, so upstream
+   changes to Minimal keep flowing in with few merge conflicts (see FORK.md).
+
+   - Cool neutral near-black instead of warm brown-black.
+   - Still one typeface (IBM Plex Sans) and one red signal for urgent mail.
+   - Quiet controls: soft filled buttons instead of outlined boxes, no all-caps status text.
+   - Panels are raised surfaces with soft corners, not hairline boxes.
+   Applies to Minimal + Dark only. Extra dark (data-tone="black") keeps its own style.
+   ========================================================= */
+
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] {
+  --ink: 233 236 240;
+  --bg: #0d0e10;
+  --surface: #15171a;
+  --surface2: #1d2024;
+  --line: rgb(var(--ink) / 0.07);
+  --accent: #ff5c66;
+  --due-soon: #ff5c66;
+  --floor: 0.56;
+  --floor-lg: 0.42;
+  --r: 8px;
+  --r-sm: 6px;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.5);
+}
+
+/* soft corners on controls and panels (Minimal forces square ones with !important) */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.pillbtn, .cta, .menu, .sheet, .toast, .mv-frame, .att, .att-thumb, .seg, .look-card, .look-prev, .sk) { border-radius: var(--r) !important; }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.iconbtn, .menu-item, .seg button, .searchbar, .swatch, .att-kind) { border-radius: var(--r-sm) !important; }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.avatar.me, .toggle .knob, .toggle .knob::after) { border-radius: 99px !important; }
+
+/* top bar: status is a quiet line of text, not a boxed all-caps badge */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .appbar { background: rgb(13 14 16 / 0.86); backdrop-filter: saturate(1.4) blur(12px); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .sync { border: 0; text-transform: none; letter-spacing: 0 !important; /* look-shared sets 0.08em !important */ color: rgb(var(--ink) / var(--floor)); border-radius: var(--r-sm); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .sync:hover { background: var(--surface); color: rgb(var(--ink) / 0.85); }
+
+/* search: a filled field on the phone and laptop alike */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .searchbar { background: var(--surface); border-bottom: 0; padding: 0 12px; box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow 0.2s var(--ease); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .searchbar:focus-within { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.32); }
+
+/* buttons: one style. Filled surface, no outline, brighter on hover */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .pillbtn { background: var(--surface2); border: 0; color: rgb(var(--ink) / 0.9); letter-spacing: 0; font-weight: 500; transition: background-color 0.15s var(--ease), color 0.15s var(--ease); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .pillbtn:hover { background: rgb(var(--ink) / 0.12); color: rgb(var(--ink)); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .pillbtn.on { background: rgb(var(--ink)); color: var(--bg); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .iconbtn:hover { background: var(--surface2); }
+
+/* open mail: due date and summary are raised panels, not hairline boxes */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.mv-due, .mv-sum) { background: var(--surface); box-shadow: none; border-radius: var(--r); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .mv-bar { background: rgb(13 14 16 / 0.86); backdrop-filter: saturate(1.4) blur(12px); }
+
+/* laptop overview: same panels */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.ov-stats div, .ov-item) { background: var(--surface); box-shadow: none; border-radius: var(--r); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .ov-item { transition: background-color 0.15s var(--ease); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .ov-item:hover { background: var(--surface2); }
+
+/* rows: a soft highlight on hover and for the open mail */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .row-main { border-radius: var(--r); transition: background-color 0.15s var(--ease); }
+
+/* menus and sheets float on a shadow, not a border */
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] :is(.menu, .sheet) { background: var(--surface); box-shadow: 0 0 0 1px var(--line), 0 16px 48px rgb(0 0 0 / 0.5); }
+:root[data-look="minimal"][data-theme="dark"][data-tone="normal"] .toast { background: var(--surface2); color: rgb(var(--ink)); box-shadow: 0 8px 32px rgb(0 0 0 / 0.5); }
