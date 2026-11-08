@@ -3,6 +3,8 @@
 > **This checkout is the fork prashumanocg/delt.** Read `FORK.md` first. In this fork, these rules
 > replace the Git section below: commit as `prashumanocg`, never as Pranav; don't push, open PRs or
 > file issues without the owner's approval; keep personal changes out of `upstream/*` branches.
+> End every reply with a short **What you need to do** list: numbered steps for the owner, or
+> "Nothing, I'm continuing with …" when there are none.
 
 Read this file and `docs/PROJECT_STATE.md` first. Open other files only when the task needs them.
 
