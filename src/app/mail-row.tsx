@@ -3,12 +3,13 @@
 // One mail row: tap to open, swipe to act.
 import { memo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import type { EmailRow } from "@/lib/supabase";
-import { cleanSender, cleanSubject, dueLevel, dueLabel, gapText, initials, pileLabel, senderCode, shortTime, timeOfDay } from "@/lib/inbox";
+import { cleanSender, cleanSubject, dueLevel, dueLabel, gapText, initials, pileLabel, sameRow, senderCode, shortTime, timeOfDay } from "@/lib/inbox";
 import type { Look } from "./use-look";
 
 export type RowActions = { open: (m: EmailRow) => void; read: (m: EmailRow) => void; done: (m: EmailRow) => void };
 
-// memo: a row re-renders only when its own mail, position, gap or the minute changes (#20)
+// memo: a row re-renders only when its own mail, position or settings change (#20), or when the
+// 30-second clock changes a time, deadline or gap it shows (#165, sameRow)
 // #61: a row renders only what the current look shows (Glyph: avatar, pile tag, unread dot;
 // Minimal: time column; Grid: position, sender code, gap), the swipe background only while
 // swiping, and the hover buttons only on devices with a mouse.
@@ -147,7 +148,7 @@ export const MailRow = memo(function MailRow({ m, now, pos = 0, on, current = fa
       </div>
     </li>
   );
-});
+}, sameRow);
 
 /** #57: the searched words, marked in a subject or sender. */
 function Marked({ text, query }: { text: string; query: string }) {
