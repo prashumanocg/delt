@@ -1,20 +1,23 @@
 "use client";
 
 // The short message at the bottom of the screen, with Undo or a second choice when there is one.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
+import { toastReducer, type ToastMsg } from "@/lib/toast-history";
 
-export type ToastMsg = { text: string; undo?: () => void; alt?: { label: string; run: () => void } };
+export type { ToastMsg };
 
 const life = (t: ToastMsg) => (t.alt ? 8000 : t.undo ? 5000 : 2600);
 
 export function useToast() {
-  const [toast, setToast] = useState<ToastMsg | null>(null);
+  const [{ toast }, dispatch] = useReducer(toastReducer, { toast: null, history: [] });
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), life(toast));
+    const t = setTimeout(() => dispatch({ type: "expire", at: Date.now() }), life(toast));
     return () => clearTimeout(t);
   }, [toast]);
-  return [toast, setToast] as const;
+  // same shape as before: set a message, or null to close the one on screen
+  const set = useCallback((msg: ToastMsg | null) => dispatch(msg ? { type: "show", msg, at: Date.now() } : { type: "close", at: Date.now() }), []);
+  return [toast, set] as const;
 }
 
 export function Toast({ toast, onClose }: { toast: ToastMsg | null; onClose: () => void }) {

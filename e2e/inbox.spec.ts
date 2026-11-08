@@ -32,6 +32,22 @@ test.describe("swiping (phone)", () => {
     await expect(page.locator(row("hack"))).not.toHaveClass(/done/);
   });
 
+  test("two swipes, two Undos: the first action's Undo comes back after the second's (#212)", async ({ page }) => {
+    await mockApi(page, smallInbox());
+    await page.goto("/e2e");
+    await swipe(page, row("hack"), -130);
+    await expect(page.locator(row("hack"))).toHaveClass(/done/);
+    await swipe(page, row("club"), -130);
+    await expect(page.locator(row("club"))).toHaveClass(/done/);
+    const undo = page.getByRole("status").getByRole("button", { name: "Undo" });
+    await undo.click();
+    await expect(page.locator(row("club"))).not.toHaveClass(/done/);
+    await expect(page.locator(row("hack"))).toHaveClass(/done/);
+    await undo.click(); // the first swipe's Undo is back
+    await expect(page.locator(row("hack"))).not.toHaveClass(/done/);
+    await expect(page.getByRole("status")).toHaveCount(0);
+  });
+
   test("a short drag does nothing, and a swipe never opens the mail", async ({ page }) => {
     const api = await mockApi(page, smallInbox());
     await page.goto("/e2e");
