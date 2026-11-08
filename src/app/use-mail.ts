@@ -126,17 +126,22 @@ export function useSearch(query: string) {
       setSearching(false);
       return;
     }
-    let alive = true;
+    // #149: a newer query cancels the request still out for the old one, so fast typing on a
+    // slow connection doesn't send searches that pile up behind each other.
+    const ctl = new AbortController();
     setSearching(true);
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`/api/emails?q=${encodeURIComponent(q)}&limit=200`);
-        if (alive && r.ok) setHits((await r.json()).emails ?? []);
+        const r = await fetch(`/api/emails?q=${encodeURIComponent(q)}&limit=200`, { signal: ctl.signal });
+        if (r.ok) {
+          const emails = (await r.json()).emails ?? [];
+          if (!ctl.signal.aborted) setHits(emails);
+        }
       } catch {}
-      if (alive) setSearching(false);
+      if (!ctl.signal.aborted) setSearching(false);
     }, 300);
     return () => {
-      alive = false;
+      ctl.abort();
       clearTimeout(t);
     };
   }, [query]);

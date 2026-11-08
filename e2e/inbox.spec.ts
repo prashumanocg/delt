@@ -471,6 +471,26 @@ test("an empty search says what was searched and offers to widen it; matches are
   await expect(page.locator(row("fee")).locator("mark")).toHaveText("Hostel");
 });
 
+test("typing on, while a slow search is still out, cancels it; the newest search wins (#149)", async ({ page }) => {
+  await mockApi(page, smallInbox());
+  // searches take 3 s here, like a slow phone connection; everything else goes to the usual fake API
+  await page.route(/\/api\/emails\?.*q=/, async (route) => {
+    await new Promise((r) => setTimeout(r, 3000));
+    await route.fallback().catch(() => {}); // the app may have cancelled it meanwhile
+  });
+  const cancelled: string[] = [];
+  page.on("requestfailed", (r) => r.url().includes("q=") && cancelled.push(new URL(r.url()).searchParams.get("q") ?? ""));
+  const sent = page.waitForRequest(/q=hos(&|$)/);
+  const box = page.getByRole("textbox", { name: "Search mail" });
+  await page.goto("/e2e");
+  await box.fill("hos");
+  await sent;
+  await box.fill("hostel");
+  await expect(page.locator(row("fee"))).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator(row("cat1"))).toHaveCount(0);
+  expect(cancelled).toEqual(["hos"]);
+});
+
 test("the sign-in page shows a sorted example, Google's button and the Android app (#58)", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "An example of a sorted inbox" }).getByRole("listitem")).toHaveCount(4);
