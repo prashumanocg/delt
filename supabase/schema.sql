@@ -87,6 +87,9 @@ alter table users add column if not exists ai_day text;
 alter table users add column if not exists ai_calls int not null default 0;
 -- #4/#5: when the student last opened the app; active students are synced more often.
 alter table users add column if not exists last_seen_at timestamptz;
+-- The Google display name, saved at sign-in (src/auth.ts); the register number in it gives the batch.
+-- Without this column a fresh database rejects every sign-in.
+alter table users add column if not exists name text;
 
 -- Small shared settings, e.g. when the shared Gemini key may be used again.
 create table if not exists app_state (
