@@ -148,7 +148,7 @@ test("a session that runs out mid-use says so and keeps the screen as it was, no
   await page.goto("/e2e");
   await expect(page.locator(row("fee"))).toBeVisible();
   await page.evaluate(() => ((window as unknown as { stillHere: boolean }).stillHere = true));
-  await page.getByRole("textbox", { name: "Search mail" }).fill("hostel");
+  await (await searchBox(page)).fill("hostel");
   await expect(page.locator(row("cat1"))).toHaveCount(0);
   // the session expires: every API call now answers 401
   await page.route("**/api/**", (r) => r.fulfill({ status: 401, contentType: "application/json", body: '{"error":"Not signed in"}' }));
@@ -157,7 +157,7 @@ test("a session that runs out mid-use says so and keeps the screen as it was, no
   await expect(banner).toBeVisible();
   await expect(banner.getByRole("button", { name: "Sign in again" })).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
-  await expect(page.getByRole("textbox", { name: "Search mail" })).toHaveValue("hostel");
+  await expect(await searchBox(page)).toHaveValue("hostel");
   await expect(page.getByText("Couldn't reach Gmail")).toHaveCount(0);
 });
 
@@ -518,8 +518,8 @@ test("typing on, while a slow search is still out, cancels it; the newest search
   const cancelled: string[] = [];
   page.on("requestfailed", (r) => r.url().includes("q=") && cancelled.push(new URL(r.url()).searchParams.get("q") ?? ""));
   const sent = page.waitForRequest(/q=hos(&|$)/);
-  const box = page.getByRole("textbox", { name: "Search mail" });
   await page.goto("/e2e");
+  const box = await searchBox(page);
   await box.fill("hos");
   await sent;
   await box.fill("hostel");
