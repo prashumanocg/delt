@@ -105,14 +105,20 @@ when the open count drops below 3.
 | 237–286 | feature ideas | | skip | none is tiny |
 
 ## PRs waiting to be sent
-Open these when fewer than 3 of ours are open upstream.
+15 branches, each pushed to this fork with a pre-filled PR link in [FORK-PRS.md](FORK-PRS.md).
+Open them oldest first when fewer than 3 of ours are open upstream. FORK-PRS.md also lists where they overlap.
 
-| Branch | Fixes | Pre-filled PR link |
-|---|---|---|
+Found while testing (not on the issue list): upstream's keyboard test reads `api.patches` before the
+PATCH arrives (fails 10/40 runs here), and `transition()` lets a skipped view transition throw
+"Transition was skipped" (fails 10/10 in a targeted test). Both have their own branch.
+Pre-existing flakes on upstream/main here, left alone: `desktop.spec.ts:102` grid A05 (1/18 runs)
+and `layout.spec.ts:102` (#67 Back arrow, phone).
 
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-08 Merged 15 upstream branches (#185, #180, #171, #149, #182, #121, #170, #165, #152, #150, #106, #119, #118, a flaky keyboard test, skipped view transitions). PRs queued in FORK-PRS.md (pace limit). #121 and #106 need their new SQL run on this fork's database too.
+- 2026-11-08 Ranked upstream's 168 open issues in "Upstream queue".
 - 2026-11-08 Merged `upstream/236-skip-links`: skip buttons and F6 between list and mail (#236). Meant for upstream.
 - 2026-11-08 Merged `upstream/101-mail-text-higher`: report link under the mail, Summary on one line; mail text ~80px higher on phones (#101). Meant for upstream.
 - 2026-11-08 Merged `upstream/212-undo-stack`: Undo history, so a second action no longer drops the first Undo (#212). Meant for upstream.
