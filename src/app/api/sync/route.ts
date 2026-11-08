@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { GMAIL_DOWN, fromGoogle, serverError } from "@/lib/api-error";
 import { db } from "@/lib/supabase";
-import { claimSync, finishSync, syncUser } from "@/lib/sync";
+import { claimSync, claimSyncLater, finishSync, finishSyncLater, syncUser } from "@/lib/sync";
 import { AccessRevoked } from "@/lib/gmail";
 import { limited } from "@/lib/rate-limit";
 import { dueForSync } from "@/lib/schedule";
@@ -31,11 +31,15 @@ export async function POST(req: NextRequest) {
   if (req.nextUrl.searchParams.get("phase") === "later") {
     const tooMany = limited(email, "ai");
     if (tooMany) return tooMany;
+    // #106: another tab or device is already running it for this student
+    if (!(await claimSyncLater(email))) return NextResponse.json({ busy: true, resorted: 0, labeled: 0 }, { status: 429 });
     try {
       const r = await syncUser(email, "later");
       return NextResponse.json({ resorted: r.rechecked, labeled: r.labeled });
     } catch (e) {
       return e instanceof AccessRevoked ? NextResponse.json({ error: e.message, reauth: true }, { status: 409 }) : serverError("sync later", e);
+    } finally {
+      await finishSyncLater(email);
     }
   }
   // At most one sync per student every 10 s, and never two at once (#30): extra taps and tabs

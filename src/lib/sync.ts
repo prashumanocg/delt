@@ -317,6 +317,20 @@ export async function finishSync(email: string) {
   await D.db.from("users").update({ sync_finished_at: new Date().toISOString() }).eq("email", email);
 }
 
+/** #106: the "later" phase (AI re-checks, Gmail labels) has its own lock (claim_sync_later in
+ *  schema.sql), so two tabs can't both run it. Without the function (older database), it's allowed. */
+export async function claimSyncLater(email: string): Promise<boolean> {
+  const { data, error } = await D.db.rpc("claim_sync_later", { p_email: email });
+  if (error) {
+    console.warn("claim_sync_later unavailable, running without the lock:", error.message);
+    return true;
+  }
+  return data === true;
+}
+export async function finishSyncLater(email: string) {
+  await D.db.from("users").update({ later_started_at: null }).eq("email", email);
+}
+
 /** Issue #10: remember that Google access is gone, so the app asks the student to sign in
  *  again and background sync stops trying. Cleared on the next sign-in (auth.ts). */
 export async function markRevoked(email: string) {
