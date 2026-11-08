@@ -74,20 +74,20 @@ when the open count drops below 3.
 
 | # | Title | Size | Do? | Status / why |
 |---|---|---|---|---|
-| 185 | Package still named vit-mail-organizer | S | do | |
-| 180 | README test badge says 231 tests | S | do | drop the hard-coded number |
-| 171 | Throwaway `zz-*` specs run with the real suite | S | do | |
-| 149 | Search requests can pile up | S | do | |
-| 182 | DESIGN.md's code map is out of date | S | do | |
-| 121 | Missing indexes for sync's filters | S | do | additive `create index if not exists` |
-| 170 | Local browser tests run on the dev server | S | do | |
-| 165 | The 30-second clock re-renders every row | M | do | |
-| 152 | Session expiring mid-use reloads the page | M | do | |
-| 150 | Every sync failure says "Couldn't reach Gmail" | M | do | |
-| 106 | "later" sync phase has no lock | M | do | needs a schema column; Pranav applies it |
-| 119 | Every inbox load writes "last seen" | M | do | |
-| 118 | Each sync writes the users row 3–4 times | M | do | |
-| 166 | Dark mail recolouring is one long task | M | do | |
+| 185 | Package still named vit-mail-organizer | S | do | done: branch `upstream/185-package-name`, PR queued |
+| 180 | README test badge says 231 tests | S | do | done: `upstream/180-test-badge`, PR queued |
+| 171 | Throwaway `zz-*` specs run with the real suite | S | do | done: `upstream/171-scratch-specs`, PR queued |
+| 149 | Search requests can pile up | S | do | done: `upstream/149-search-abort`, PR queued |
+| 182 | DESIGN.md's code map is out of date | S | do | done: `upstream/182-design-code-map`, PR queued |
+| 121 | Missing indexes for sync's filters | S | do | done: `upstream/121-sync-indexes`, PR queued; Pranav runs the new SQL |
+| 170 | Local browser tests run on the dev server | S | do | done: `upstream/170-e2e-on-build`, PR queued |
+| 165 | The 30-second clock re-renders every row | M | do | done: `upstream/165-row-clock`, PR queued |
+| 152 | Session expiring mid-use reloads the page | M | do | done: `upstream/152-signed-out-banner`, PR queued |
+| 150 | Every sync failure says "Couldn't reach Gmail" | M | do | done: `upstream/150-sync-error-words`, PR queued |
+| 106 | "later" sync phase has no lock | M | do | done: `upstream/106-later-lock`, PR queued; Pranav runs the new SQL |
+| 119 | Every inbox load writes "last seen" | M | do | done: `upstream/119-last-seen`, PR queued |
+| 118 | Each sync writes the users row 3–4 times | M | do | done: `upstream/118-one-user-write`, PR queued (3–4 writes → 2; the lock release stays separate) |
+| 166 | Dark mail recolouring is one long task | M | skip for now | chunking means the lower part of a long mail shows light for a moment before turning dark; Pranav should choose that or hiding the frame until done |
 | 134 | CSP allows inline scripts | M | do | nonces; needs care with Next's inline scripts |
 | 155 | "Large text" uses CSS zoom | L | do | |
 | 164 | Long lists render every row | L | do | |
