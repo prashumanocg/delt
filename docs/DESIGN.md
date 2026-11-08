@@ -92,7 +92,7 @@ and that every name here still exists).
 
 **App shell and pages**
 - `src/app/layout.tsx`: the HTML shell and the bundled fonts. `page.tsx`: sign-in or the app. `error.tsx` (#228), `not-found.tsx` (#229), `privacy/`, `e2e/` (fake-mail inbox for browser tests), `icons/`, `manifest.ts` (installable app).
-- `src/app/inbox-app.tsx`: the two-tab app. It wires together `use-mail.ts` (loading, paging, search, offline copy), `use-sync.ts` (checking Gmail), `use-mail-actions.ts` (changes with Undo), `use-screen.ts` (route, screen size, gestures), `use-look.ts` (which look is on, hover or touch), `use-dialog.ts` (focus and Esc for panels) and the components `inbox-list.tsx`, `deadlines-list.tsx`, `mail-row.tsx`, `list-states.tsx` (loading and empty states), `overview.tsx` (laptop pane with no mail open), `account-menu.tsx`, `banners.tsx`, `tabs.tsx`, `toast.tsx`, `welcome.tsx` (first-run help).
+- `src/app/inbox-app.tsx`: the two-tab app. It wires together `use-mail.ts` (loading, paging, search, offline copy), `use-sync.ts` (checking Gmail), `use-mail-actions.ts` (changes with Undo), `use-screen.ts` (route, screen size, gestures), `use-look.ts` (which look is on, hover or touch), `use-dialog.ts` (focus and Esc for panels) and the components `inbox-list.tsx`, `deadlines-list.tsx`, `mail-row.tsx`, `list-states.tsx` (loading and empty states), `overview.tsx` (laptop pane with no mail open), `account-menu.tsx`, `banners.tsx`, `tabs.tsx`, `toast.tsx` (with `src/lib/toast-history.ts`, the Undo history, #212), `welcome.tsx` (first-run help).
 - `src/app/motion.ts`: screen changes animated with View Transitions.
 
 **Reading a mail**
@@ -105,7 +105,7 @@ and that every name here still exists).
 
 **Server and shared helpers (`src/lib/`)**
 - Sorting: `rules.ts`, `classify.ts` (the AI check), `topics.ts` (learning from moves by topic), `profile.ts` (batch, branch and year from the Google name).
-- Gmail and sync: `gmail.ts`, `sync.ts`, `sync-plan.ts` (what one run saves, and when it moves `last_synced_at`), `attachments.ts`, `app-update.ts` (Android build check).
+- Gmail and sync: `gmail.ts`, `sync.ts`, `sync-message.ts` (what the app says when a check fails, #150), `sync-plan.ts` (what one run saves, and when it moves `last_synced_at`), `attachments.ts`, `app-update.ts` (Android build check).
 - `src/lib/schedule.ts`: who background sync checks next (active students ~15 min, others daily). Run by `.github/workflows/sync.yml`.
 - `src/lib/ai-quota.ts` + `src/lib/secret.ts`: fair share of the shared Gemini key, and encryption for students' own keys.
 - `src/lib/notify-plan.ts` + `src/lib/notify.ts` + `public/sw.js`: phone notifications for urgent mail and deadlines due within a day.
