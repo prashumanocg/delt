@@ -63,6 +63,53 @@ npm test
 #287 and #292 both edit `inbox-app.tsx` and `base.css`; whichever merges second will need a rebase
 (the same conflict was resolved on our `main` in 0069d6c).
 
+## Upstream queue
+Triaged 2026-11-08 from the 168 open issues on pranavvehmid/delt. Upstream `main` was still at
+`414de98` (no new commits, no PRs of Pranav's own), so nothing below is already covered there.
+Easiest first. Size: S = under an hour, M = a day, L = more.
+
+**Pace:** 6 of our PRs (#287–#292) are open with no review, which is over the limit of 3. New fixes
+get a branch on this fork and a pre-filled PR link in "PRs waiting to be sent"; they are opened only
+when the open count drops below 3.
+
+| # | Title | Size | Do? | Status / why |
+|---|---|---|---|---|
+| 185 | Package still named vit-mail-organizer | S | do | |
+| 180 | README test badge says 231 tests | S | do | drop the hard-coded number |
+| 171 | Throwaway `zz-*` specs run with the real suite | S | do | |
+| 149 | Search requests can pile up | S | do | |
+| 182 | DESIGN.md's code map is out of date | S | do | |
+| 121 | Missing indexes for sync's filters | S | do | additive `create index if not exists` |
+| 170 | Local browser tests run on the dev server | S | do | |
+| 165 | The 30-second clock re-renders every row | M | do | |
+| 152 | Session expiring mid-use reloads the page | M | do | |
+| 150 | Every sync failure says "Couldn't reach Gmail" | M | do | |
+| 106 | "later" sync phase has no lock | M | do | needs a schema column; Pranav applies it |
+| 119 | Every inbox load writes "last seen" | M | do | |
+| 118 | Each sync writes the users row 3–4 times | M | do | |
+| 166 | Dark mail recolouring is one long task | M | do | |
+| 134 | CSP allows inline scripts | M | do | nonces; needs care with Next's inline scripts |
+| 155 | "Large text" uses CSS zoom | L | do | |
+| 164 | Long lists render every row | L | do | |
+| 173 | API route handlers have no runtime tests | L | do | |
+| 154 | Launch colours are always light | S | skip | which colour is a design call for Pranav |
+| 141 | AI model name is an alias | S | skip | pinning needs an eval run with a real Gemini key |
+| 123 | Unused `deadlines` table | S | skip | drops a table on the live database; Pranav's call |
+| 167 | Attachments re-download the message | M | skip | can't verify `format=metadata` without a real inbox |
+| 101, 102, 212, 236 | | | covered | our PRs #291, #287, #290, #292 |
+| 1, 15, 17, 78, 148, 163, 172 | real inboxes, other people, real phones, Windows | | skip | need hardware or people we don't have |
+| 37, 79, 93–99, 137, 140, 176–179 | accounts, Google verification, infra, money | | skip | Pranav's accounts or paid/verified services |
+| 83, 105, 122, 124, 126, 127, 136, 135 | schema or security redesigns | L | skip | need a design decision from Pranav first |
+| 88, 100, 115, 128, 131, 143–147, 151, 153, 156–161, 168, 169, 174, 175, 181, 183, 184 | | M–L | skip for now | product or design decisions, or large rewrites that would clash with Pranav's work |
+| 186–233 (frontend audit) | | M–L | skip for now | mostly layout and design decisions |
+| 237–286 | feature ideas | | skip | none is tiny |
+
+## PRs waiting to be sent
+Open these when fewer than 3 of ours are open upstream.
+
+| Branch | Fixes | Pre-filled PR link |
+|---|---|---|
+
 ## Log
 Newest first. One line per change: what and why.
 
