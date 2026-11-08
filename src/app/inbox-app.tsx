@@ -159,11 +159,35 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
       <SearchIcon />
     </button>
   );
+  // #236: keyboard users reach the list or the open mail without tabbing through everything before it
+  const focusList = () => {
+    const rows = document.querySelector("main.page");
+    const current = route.mailId ? rows?.querySelector<HTMLElement>(`[data-mail="${CSS.escape(route.mailId)}"] .row-main`) : null;
+    (current ?? rows?.querySelector<HTMLElement>(".row-main") ?? rows?.querySelector<HTMLElement>("button, a[href], input"))?.focus();
+  };
+  const focusMail = () => document.getElementById("mv-title")?.focus();
+  // F6 moves between the list and the open mail in the laptop's split view, as in desktop mail apps
+  useEffect(() => {
+    if (!wide || !route.mailId) return;
+    const k = (e: KeyboardEvent) => {
+      if (e.key !== "F6" || e.defaultPrevented || document.querySelector('[aria-modal="true"]')) return;
+      e.preventDefault();
+      if (document.activeElement?.closest(".mailview")) focusList();
+      else focusMail();
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  });
   const gmailHome = `https://mail.google.com/mail/?authuser=${encodeURIComponent(email)}`;
   const { syncProblem } = data;
 
   return (
     <div className={`shell ${wide ? "reading" : ""} ${swipeHint ? "hinting" : ""}`}>
+      {/* #236: the first Tab stops; hidden until focused */}
+      <div className="skips">
+        <button onClick={focusList}>Skip to {route.tab === "deadlines" ? "deadlines" : "mail list"}</button>
+        {wide && route.mailId && <button onClick={focusMail}>Skip to open mail</button>}
+      </div>
       <header className="appbar">
         <a href="#/inbox" className="logo" onClick={() => goTab("inbox")} aria-label="DELT inbox">
           <span>DELT</span>

@@ -2,7 +2,7 @@
 // for screen reader users in either look, light or dark.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { mockApi, smallInbox } from "./mock";
+import { bigInbox, mockApi, smallInbox } from "./mock";
 
 async function axe(page: Page, what: string) {
   // measure the finished screen, not a fade-in halfway through
@@ -226,4 +226,48 @@ test("Esc closes the mail even when focus is on a link inside the mail itself", 
   await link.focus();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
+});
+
+// #236: in the laptop's split view, keyboard users skip the header and the list, and F6 moves between list and mail
+test.describe("skip to the list or the open mail (#236)", () => {
+  test.skip(({ isMobile }) => !!isMobile, "the split view is a laptop layout");
+
+  test("the first Tab stops skip to the list, then to the open mail; F6 moves between them", async ({ page }) => {
+    await mockApi(page, bigInbox(60));
+    await page.goto("/e2e");
+    const firstRow = page.locator("li.row .row-main").first();
+    await expect(firstRow).toBeVisible();
+
+    // nothing open: one skip button, off screen until it has focus, and it lands on the first mail
+    const toList = page.getByRole("button", { name: "Skip to mail list" });
+    expect(await toList.evaluate((b) => b.getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
+    await page.keyboard.press("Tab");
+    await expect(toList).toBeFocused();
+    expect(await toList.evaluate((b) => b.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0);
+    await page.keyboard.press("Enter");
+    await expect(firstRow).toBeFocused();
+
+    // open a mail further down the list
+    const row = page.locator("li.row .row-main").nth(20);
+    const id = await row.evaluate((el) => el.closest("li")!.dataset.mail!);
+    await row.click();
+    await expect(page.locator("#mv-title")).toBeVisible();
+
+    // arriving with that mail open (a reload keeps it): skip to the list, then the open mail, in two Tabs
+    await page.reload();
+    await expect(page.locator("#mv-title")).toBeVisible();
+    await page.keyboard.press("Tab");
+    await expect(toList).toBeFocused();
+    await page.keyboard.press("Tab");
+    const toMail = page.getByRole("button", { name: "Skip to open mail" });
+    await expect(toMail).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#mv-title")).toBeFocused();
+
+    // F6: back to that mail's own row, and over to the mail again
+    await page.keyboard.press("F6");
+    await expect(page.locator(`li.row[data-mail="${id}"] .row-main`)).toBeFocused();
+    await page.keyboard.press("F6");
+    await expect(page.locator("#mv-title")).toBeFocused();
+  });
 });

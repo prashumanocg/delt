@@ -112,11 +112,11 @@ export default function MailFrame({ id, msg }: { id: string; msg: FullMessage })
     const doc = frame.current?.contentDocument;
     if (!doc?.body) return;
     // Keys pressed while focus is inside the mail (a link in it) belong to that document, not DELT's.
-    // Pass Esc and J/K on so the mail still closes and steps from there.
+    // Pass Esc and J/K on so the mail still closes and steps from there, and F6 to get back to the list (#236).
     if (!doc.body.dataset.keys) {
       doc.body.dataset.keys = "1";
       doc.addEventListener("keydown", (e) => {
-        if (e.key !== "Escape" && e.key !== "j" && e.key !== "k") return;
+        if (e.key !== "Escape" && e.key !== "j" && e.key !== "k" && e.key !== "F6") return;
         const passed = new KeyboardEvent("keydown", { key: e.key, bubbles: true, cancelable: true });
         if (!document.dispatchEvent(passed)) e.preventDefault();
         if (e.key === "Escape") frame.current?.focus();
