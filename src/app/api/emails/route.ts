@@ -7,6 +7,7 @@ import { CATEGORIES } from "@/lib/types";
 import { PAGE_SIZE, searchPattern } from "@/lib/inbox";
 import { ensureLabels, getAccessToken, markRead, markUnread, setPriorityLabel } from "@/lib/gmail";
 import { limited } from "@/lib/rate-limit";
+import { seenIsStale } from "@/lib/schedule";
 
 // user_email stays: the database tests use it to prove no student ever gets another's mail
 const LIST_COLUMNS = "id, user_email, thread_id, from_name, from_address, subject, snippet, received_at, priority, summary, deadline, reason, user_corrected, is_done, unread";
@@ -54,10 +55,12 @@ export async function GET(req: NextRequest) {
   let aiConsent: boolean | null | undefined;
   let syncProblem: string | null = null;
   if (!before && !pattern && !due) {
-    await db.from("users").update({ last_seen_at: new Date().toISOString() }).eq("email", email);
-    const { data: u, error: userError } = await db.from("users").select("access_revoked, ai_consent, last_sync_error").eq("email", email).maybeSingle();
+    // #119: one read; "last seen" is written only when it's an hour old (it only needs to say
+    // "active this week"), not on every load
+    const { data: u, error: userError } = await db.from("users").select("access_revoked, ai_consent, last_sync_error, last_seen_at").eq("email", email).maybeSingle();
     // #130: the account was deleted on another device; the app reloads and lands on sign-in
     if (!userError && !u) return NextResponse.json({ error: "Signed out", gone: true }, { status: 401 });
+    if (userError || seenIsStale(u?.last_seen_at, Date.now())) await db.from("users").update({ last_seen_at: new Date().toISOString() }).eq("email", email);
     reauth = !!u?.access_revoked; // issue #10
     aiConsent = u ? (u.ai_consent ?? null) : undefined; // #31: null = not asked yet
     syncProblem = u?.last_sync_error ?? null; // #40

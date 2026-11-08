@@ -6,6 +6,10 @@
 export const ACTIVE_WINDOW_MS = 7 * 86400_000;
 export const ACTIVE_EVERY_MS = 14 * 60_000;
 export const DAILY_EVERY_MS = 20 * 3600_000;
+/** #119: "last seen" only decides active (seen within 7 days) or not, so the inbox writes it at
+ *  most once an hour instead of on every load. */
+export const SEEN_EVERY_MS = 3600_000;
+export const seenIsStale = (lastSeen: string | null | undefined, now: number) => !lastSeen || now - Date.parse(lastSeen) >= SEEN_EVERY_MS;
 
 export type SyncCandidate = { email: string; last_synced_at: string | null; last_seen_at: string | null; access_revoked?: boolean | null };
 
