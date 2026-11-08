@@ -302,3 +302,20 @@ for (const look of LOOKS) {
     expect(bar!.width).toBeGreaterThan(row!.width * 0.5);
   });
 }
+
+// #101: on a phone the mail's own text starts in the top half; "Wrong pile?" waits under it.
+for (const look of LOOKS) {
+  test(`${look}: on a phone the open mail's text starts in the top 56% of the screen (#101)`, async ({ page, isMobile }) => {
+    test.skip(!isMobile, "phone screens only");
+    await open(page, look);
+    await page.locator('li.row[data-mail="fee"] .row-main').click(); // a mail with a deadline and a summary: the tallest header
+    await expect(page.locator(".mv-frame")).toBeVisible();
+    const [body, report, sum] = [await box(page, ".mv-body"), await box(page, ".mv-report"), await box(page, ".mv-sum")];
+    const h = await page.evaluate(() => innerHeight);
+    expect(body.top / h, `mail text at ${Math.round((body.top / h) * 100)}%`).toBeLessThan(0.56); // was 55-64% before #101
+    expect(report.top).toBeGreaterThanOrEqual(body.bottom); // under the mail, not above it
+    // "Summary" shares a line with the text: the box is one line tall for a one-line summary
+    const lbl = await box(page, ".mv-sum .lbl");
+    expect(Math.abs(lbl.top - sum.top - (sum.height - lbl.height) / 2)).toBeLessThanOrEqual(6);
+  });
+}

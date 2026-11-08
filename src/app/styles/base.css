@@ -281,7 +281,9 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .mv-due { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding: 8px 12px 8px 16px; border-radius: 14px; background: var(--surface); font-size: 14px; }
 .mv-due.lv-over b, .mv-due.lv-soon b { color: var(--due-soon); }
 .mv-due.lv-week b { color: var(--due-week); }
-.mv-sum { margin: 12px 0 0; padding: 12px 16px; border-radius: 14px; background: var(--surface); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+/* #101: "Summary" runs into the text on its line instead of taking a line of its own */
+.mv-sum { margin: 12px 0 0; padding: 12px 16px; border-radius: 14px; background: var(--surface); font-size: 14px; }
+.mv-sum .lbl { margin-right: 8px; }
 .mv-unsub { display: inline-block; margin-top: 12px; font-size: 12.5px; text-decoration: underline; }
 /* #72: attachments. Pictures as thumbnails (tap to view), other files as cards */
 .mv-att { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
