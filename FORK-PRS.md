@@ -10,6 +10,8 @@ Overlaps to know about when they merge (each branch is cut from upstream `main` 
 - `152` and `150` both add a test at the same place in `e2e/inbox.spec.ts`, and `149` sits next to them.
 - `182`'s code-map test will fail after `150` (adds `src/lib/sync-message.ts`) or #290 (adds `src/lib/toast-history.ts`) merge, until the map names them. Our `main` already has that line (7fd2db2).
 - `165` and #289 both edit the imports line of `src/app/mail-row.tsx`.
+- After #287 (phone search behind a button) merges, the new tests in `149` and `152` must open search with `searchBox(page)`, as on our main (commit "open phone search through searchBox()").
+- Seen in screenshots: Grid's toast wraps `150`'s longer messages onto 5 short lines. Readable; a wider toast is Pranav's call.
 
 | # | Branch | Title | Link |
 |---|---|---|---|
