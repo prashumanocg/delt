@@ -1,5 +1,9 @@
 # DELT: working notes for Claude Code
 
+> **This checkout is the fork prashumanocg/delt.** Read `FORK.md` first. In this fork, these rules
+> replace the Git section below: commit as `prashumanocg`, never as Pranav; don't push, open PRs or
+> file issues without the owner's approval; keep personal changes out of `upstream/*` branches.
+
 Read this file and `docs/PROJECT_STATE.md` first. Open other files only when the task needs them.
 
 ## What DELT is

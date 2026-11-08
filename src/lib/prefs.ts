@@ -76,7 +76,7 @@ r.dataset.look=look;r.dataset.theme=m;r.dataset.tone=tone;
 r.dataset.accent=ok(p.accent,look==="grid"?["auto","papaya","teal","navy","racing","sky","pink","gold"]:["auto","purple","blue","green","red","gold"],"auto");
 r.dataset.size=ok(p.size,["normal","large"],"normal");
 r.dataset.density=ok(p.density,["comfortable","compact"],"comfortable");
-try{var bg={minimal:{light:"#fafaf9",dark:"#161412"},glyph:{light:"#fff8e8",dark:"#17112b"},grid:{light:"#0b0b0e",dark:"#0b0b0e"}}[look][m];if(tone==="black")bg="#000000";
+try{var bg={minimal:{light:"#fafaf9",dark:"#0d0e10"},glyph:{light:"#fff8e8",dark:"#17112b"},grid:{light:"#0b0b0e",dark:"#0b0b0e"}}[look][m];if(tone==="black")bg="#000000";
 function bar(){var ms=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<ms.length;i++){ms[i].setAttribute("content",bg);ms[i].removeAttribute("media")}}
 bar();if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bar)}catch(e){}
 })()`;
