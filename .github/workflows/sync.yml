@@ -26,7 +26,7 @@ jobs:
       - name: Sync students who are due
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          SITE: https://delt-mu.vercel.app
+          SITE: ${{ vars.DELT_SITE || 'https://delt-mu.vercel.app' }} # forks set the DELT_SITE variable to their own address
         run: |
           if [ -z "$CRON_SECRET" ]; then echo "::notice::Add the CRON_SECRET repository secret to turn on background sync."; exit 0; fi
           for i in $(seq 1 8); do
@@ -44,7 +44,7 @@ jobs:
         if: always()
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          SITE: https://delt-mu.vercel.app
+          SITE: ${{ vars.DELT_SITE || 'https://delt-mu.vercel.app' }} # forks set the DELT_SITE variable to their own address
         run: |
           [ -z "$CRON_SECRET" ] && exit 0
           h=$(curl -sS --max-time 30 -H "Authorization: Bearer $CRON_SECRET" "$SITE/api/health") || { echo "::warning::Health check failed"; exit 0; }
