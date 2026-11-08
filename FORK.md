@@ -9,6 +9,8 @@ tracks it closely and adds a few personal changes on top.
 | Change | Where | Why |
 |---|---|---|
 | **Slate**: a cooler, softer version of Minimal's dark theme | `src/app/styles/look-slate.css`, `tests/slate.test.ts` | Dark mode is what I use. Raised panels and filled buttons read better on a dark screen than hairline boxes and outlined buttons |
+| Servers in Mumbai (`bom1`) instead of Dublin | `vercel.json` | This copy's database is in Mumbai and its user is in Vellore (upstream #93) |
+| Background sync reads the site from the `DELT_SITE` variable | `.github/workflows/sync.yml` | So this fork's sync job calls this fork's site, not upstream's. Also suitable for upstream: branch `fix/sync-site-variable` |
 
 Everything else (sorting, sync, privacy, the other looks) is upstream's code, unchanged.
 
@@ -51,5 +53,6 @@ npm test
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-08 Moved functions to Mumbai; sync job reads `DELT_SITE`.
 - 2026-11-08 Added Slate (Minimal dark refinement) and its contrast test.
 - 2026-11-08 Forked from upstream at `414de98`.
