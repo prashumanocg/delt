@@ -146,3 +146,16 @@ alter table users add column if not exists ai_consent boolean;
 
 -- ---------- Nov 2026: #40 sync health ----------
 alter table users add column if not exists last_sync_error text;
+
+-- ---------- Nov 2026: #121 indexes for what every sync and notify look for ----------
+-- Partial indexes: each holds only the rows a query filters for (the flags are rarely flipped),
+-- so they stay small and the queries stop scanning every stored mail of the student.
+-- sender rules: user_corrected = true, newest first (sync.ts, api/rules)
+create index if not exists emails_user_corrected_idx on emails (user_email, received_at desc) where user_corrected;
+-- Gmail labels still to put on (sync step 5)
+create index if not exists emails_user_unlabeled_idx on emails (user_email, received_at desc) where not gmail_labeled;
+-- the unread mirror (sync)
+create index if not exists emails_user_unread_idx on emails (user_email, received_at) where unread;
+-- (no index for the AI re-check backlog: most mail is rules-sorted, so one would hold most rows)
+-- urgent mail not yet notified (notify.ts); deadline reminders use emails_user_deadline_idx
+create index if not exists emails_user_unnotified_idx on emails (user_email) where priority = 'very_important' and not notified;
