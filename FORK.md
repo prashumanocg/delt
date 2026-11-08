@@ -53,6 +53,7 @@ npm test
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-08 Merged `upstream/schema-users-name`: schema.sql was missing `users.name`, so a fresh database rejected every sign-in. Meant for upstream.
 - 2026-11-08 Merged `upstream/102-phone-inbox-header` (phone search behind a button). Waiting for approval before a PR to upstream.
 - 2026-11-08 Moved functions to Mumbai; sync job reads `DELT_SITE`.
 - 2026-11-08 Added Slate (Minimal dark refinement) and its contrast test.
