@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/auth";
-import { GMAIL_DOWN, serverError } from "@/lib/api-error";
+import { GMAIL_DOWN, fromGoogle, serverError } from "@/lib/api-error";
 import { db } from "@/lib/supabase";
 import { claimSync, finishSync, syncUser } from "@/lib/sync";
 import { AccessRevoked } from "@/lib/gmail";
@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     // Google access removed: the app shows "Sign in again" (issue #10).
     if (e instanceof AccessRevoked) return NextResponse.json({ error: e.message, reauth: true }, { status: 409 });
-    return serverError("sync", e, 500, GMAIL_DOWN);
+    // #150: say whose side failed, so a DELT bug isn't blamed on Gmail
+    return fromGoogle(e) ? serverError("sync", e, 502, GMAIL_DOWN) : serverError("sync", e);
   } finally {
     await finishSync(email);
   }

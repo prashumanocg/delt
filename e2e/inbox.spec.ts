@@ -161,6 +161,25 @@ test("a session that runs out mid-use says so and keeps the screen as it was, no
   await expect(page.getByText("Couldn't reach Gmail")).toHaveCount(0);
 });
 
+test("a failed check says whose side failed: DELT or Gmail, never 'No new mail' (#150)", async ({ page }) => {
+  const api = await mockApi(page, smallInbox());
+  await page.goto("/e2e");
+  await expect(page.locator(row("fee"))).toBeVisible();
+  const refresh = page.locator("button.sync").filter({ visible: true }).first();
+
+  api.sync = { status: 500, body: { error: "Something went wrong on DELT's side. Try again." } };
+  await refresh.click();
+  await expect(page.getByText("Something went wrong on DELT's side. Try again.")).toBeVisible();
+  await expect(page.getByText("No new mail")).toHaveCount(0);
+  await expect(page.locator(row("fee"))).toBeVisible(); // the list DELT already has stays
+
+  api.sync = { status: 502, body: { error: "Gmail didn't answer. Try again in a moment." } };
+  await expect(refresh).toBeEnabled();
+  await refresh.click();
+  await expect(page.getByText("Gmail didn't answer. Try again in a moment.")).toBeVisible();
+  await expect(page.getByText("Couldn't reach Gmail")).toHaveCount(0);
+});
+
 test("Delete my data asks first, then deletes and signs out", async ({ page }) => {
   const api = await mockApi(page, smallInbox());
   await page.route("**/?deleted=1", (r) => r.fulfill({ contentType: "text/html", body: "<p>deleted page</p>" }));

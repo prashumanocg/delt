@@ -4,6 +4,7 @@
 // when the connection returns. Only one open tab checks at a time (#30).
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ToastMsg } from "./toast";
+import { syncFailureText } from "@/lib/sync-message";
 
 const SYNC_EVERY = 5 * 60_000;
 
@@ -32,6 +33,8 @@ export function useSync({ load, setReauth, setOffline, say }: Deps) {
       } catch {}
       busy.current = true;
       setSyncing(true);
+      // #150: what failed, so the message names the right side (no answer, DELT, or Gmail)
+      let failed: { status: number | null; error?: string } = { status: null };
       try {
         const r = await fetch("/api/sync", { method: "POST" });
         const d = await r.json().catch(() => ({}));
@@ -43,7 +46,16 @@ export function useSync({ load, setReauth, setOffline, say }: Deps) {
           if (loud) say({ text: "Already checking for mail" });
           return;
         }
-        if (!(await load(d.fetched > 0))) throw new Error("offline");
+        // a failed check still shows what DELT already has, then says what went wrong
+        const loaded = await load(d.fetched > 0);
+        if (!r.ok && !d.reauth) {
+          failed = { status: r.status, error: typeof d.error === "string" ? d.error : undefined };
+          throw new Error("sync failed");
+        }
+        if (!loaded) {
+          failed = { status: 500 };
+          throw new Error("load failed");
+        }
         setSyncedAt(Date.now());
         // AI re-checks and Gmail labels run after, without holding up the list (#21)
         if (!d.reauth && !d.backlog)
@@ -57,7 +69,7 @@ export function useSync({ load, setReauth, setOffline, say }: Deps) {
         if (!d.reauth && (loud || d.fetched > 0)) say({ text: d.fetched > 0 ? `${d.fetched} new mail${d.fetched > 1 ? "s" : ""}` : "No new mail" });
       } catch {
         if (!navigator.onLine) setOffline(true);
-        if (loud) say({ text: navigator.onLine ? "Couldn't reach Gmail" : "You're offline" });
+        if (loud) say({ text: syncFailureText({ online: navigator.onLine, ...failed }) });
       } finally {
         busy.current = false;
         setSyncing(false);
