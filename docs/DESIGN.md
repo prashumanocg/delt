@@ -87,13 +87,30 @@ Deadlines ─ from mail only: Overdue · Today · Tomorrow · This week · Later
 
 ## 6. Code map
 
-- `src/lib/inbox.ts`: pure helpers (filter, group by day, deadline buckets, relative time). Unit tested.
-- `src/app/inbox-app.tsx`: the two-tab app. It wires together `use-mail.ts` (loading, paging, search, offline copy), `use-sync.ts` (checking Gmail), `use-mail-actions.ts` (changes with Undo), `use-screen.ts` (route, screen size, gestures) and the components `inbox-list.tsx`, `deadlines-list.tsx`, `mail-row.tsx`, `account-menu.tsx`, `banners.tsx`, `tabs.tsx`, `toast.tsx`.
-- `src/app/mail-view.tsx`: the full-screen mail.
+Every file in `src/app/` and `src/lib/` (`tests/design-code-map.test.ts` checks the list is complete
+and that every name here still exists).
+
+**App shell and pages**
+- `src/app/layout.tsx`: the HTML shell and the bundled fonts. `page.tsx`: sign-in or the app. `error.tsx` (#228), `not-found.tsx` (#229), `privacy/`, `e2e/` (fake-mail inbox for browser tests), `icons/`, `manifest.ts` (installable app).
+- `src/app/inbox-app.tsx`: the two-tab app. It wires together `use-mail.ts` (loading, paging, search, offline copy), `use-sync.ts` (checking Gmail), `use-mail-actions.ts` (changes with Undo), `use-screen.ts` (route, screen size, gestures), `use-look.ts` (which look is on, hover or touch), `use-dialog.ts` (focus and Esc for panels) and the components `inbox-list.tsx`, `deadlines-list.tsx`, `mail-row.tsx`, `list-states.tsx` (loading and empty states), `overview.tsx` (laptop pane with no mail open), `account-menu.tsx`, `banners.tsx`, `tabs.tsx`, `toast.tsx`, `welcome.tsx` (first-run help).
+- `src/app/motion.ts`: screen changes animated with View Transitions.
+
+**Reading a mail**
+- `src/app/mail-view.tsx`: the open mail. `mail-frame.tsx`: the original mail in a locked-down frame, read live from Gmail. `mail-dark.ts`: recolours it for dark themes (#71). `mail-attachments.tsx`: thumbnails, viewer and downloads (#72).
+
+**Styles and settings**
 - `src/app/app.css`: imports the style files in cascade order: `styles/base.css` (layout for every look), `look-shared.css` (what Minimal and Grid share), `look-minimal.css`, `look-glyph.css`, `themes.css` (Extra dark, accents, size, spacing), then `look-grid.css`. A rule names the looks it is for (`:root[data-look="glyph"]`, `:root:is([data-look="minimal"], [data-look="grid"])`), never the ones it isn't.
 - `src/app/appearance.tsx` + `src/lib/prefs.ts`: the Appearance panel and saved preferences.
-- `src/app/settings.tsx`: notifications on/off, your own Gemini key, help links.
+- `src/app/settings.tsx`: the Settings panel; `settings-push.tsx` (notifications) and `settings-ai.tsx` (AI sorting, your own Gemini key).
+
+**Server and shared helpers (`src/lib/`)**
+- Sorting: `rules.ts`, `classify.ts` (the AI check), `topics.ts` (learning from moves by topic), `profile.ts` (batch, branch and year from the Google name).
+- Gmail and sync: `gmail.ts`, `sync.ts`, `sync-plan.ts` (what one run saves, and when it moves `last_synced_at`), `attachments.ts`, `app-update.ts` (Android build check).
 - `src/lib/schedule.ts`: who background sync checks next (active students ~15 min, others daily). Run by `.github/workflows/sync.yml`.
 - `src/lib/ai-quota.ts` + `src/lib/secret.ts`: fair share of the shared Gemini key, and encryption for students' own keys.
 - `src/lib/notify-plan.ts` + `src/lib/notify.ts` + `public/sw.js`: phone notifications for urgent mail and deadlines due within a day.
-- `src/lib/rules.ts`, `classify.ts`, `sync.ts`, `gmail.ts`: sorting and Gmail.
+- Data: `supabase.ts` (server-only client), `types.ts`, `all-rows.ts` (paging past 1,000 rows), `retention.ts` (old previews purged), `account.ts` (Delete my data).
+- API helpers: `rate-limit.ts`, `api-error.ts` (no raw errors to the browser).
+- Other helpers: `inbox.ts` (filter, group by day, deadline buckets, relative time), `insights.ts` (duplicates and other pure helpers), `offline.ts` (the last inbox on this device), `logo.ts` (the wordmark as shapes, for icons).
+- `src/app/api/`: the routes (`emails`, `sync`, `rules`, `push`, `settings`, `account`, `health`, `app-version`, `auth`).
+
