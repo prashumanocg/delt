@@ -36,6 +36,8 @@ export function useSync({ load, setReauth, setOffline, say }: Deps) {
         const r = await fetch("/api/sync", { method: "POST" });
         const d = await r.json().catch(() => ({}));
         if (d.reauth) setReauth(true);
+        // #152: signed out: load() puts up the Sign in again banner; no "Couldn't reach Gmail"
+        if (r.status === 401) return void (await load());
         if (r.status === 429) {
           // another check for this student is running or just ran: nothing to do
           if (loud) say({ text: "Already checking for mail" });

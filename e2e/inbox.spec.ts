@@ -143,6 +143,24 @@ test("removed Google access shows a Sign in again banner", async ({ page }) => {
   await expect(banner.getByRole("button", { name: "Sign in again" })).toBeVisible();
 });
 
+test("a session that runs out mid-use says so and keeps the screen as it was, no reload (#152)", async ({ page }) => {
+  await mockApi(page, smallInbox());
+  await page.goto("/e2e");
+  await expect(page.locator(row("fee"))).toBeVisible();
+  await page.evaluate(() => ((window as unknown as { stillHere: boolean }).stillHere = true));
+  await page.getByRole("textbox", { name: "Search mail" }).fill("hostel");
+  await expect(page.locator(row("cat1"))).toHaveCount(0);
+  // the session expires: every API call now answers 401
+  await page.route("**/api/**", (r) => r.fulfill({ status: 401, contentType: "application/json", body: '{"error":"Not signed in"}' }));
+  await page.locator("button.sync").filter({ visible: true }).first().click();
+  const banner = page.getByRole("alert").filter({ hasText: "You've been signed out" });
+  await expect(banner).toBeVisible();
+  await expect(banner.getByRole("button", { name: "Sign in again" })).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
+  await expect(page.getByRole("textbox", { name: "Search mail" })).toHaveValue("hostel");
+  await expect(page.getByText("Couldn't reach Gmail")).toHaveCount(0);
+});
+
 test("Delete my data asks first, then deletes and signs out", async ({ page }) => {
   const api = await mockApi(page, smallInbox());
   await page.route("**/?deleted=1", (r) => r.fulfill({ contentType: "text/html", body: "<p>deleted page</p>" }));

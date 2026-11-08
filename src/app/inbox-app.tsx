@@ -222,7 +222,7 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
         </div>
       </header>
 
-      <Banners aiConsent={data.aiConsent} onAnswerAi={answerAi} offline={offline} savedAt={data.savedAt} now={now} reauth={data.reauth} signInAction={signInAction} />
+      <Banners aiConsent={data.aiConsent} onAnswerAi={answerAi} offline={offline} savedAt={data.savedAt} now={now} reauth={data.reauth} signedOut={data.signedOut} signInAction={signInAction} />
 
       {pull > 0 && (
         <div className="pull" style={{ height: pull }} aria-hidden="true">

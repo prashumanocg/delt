@@ -1,6 +1,6 @@
 "use client";
 
-// The notices above the list: app update, the AI question, offline, and lost Gmail access.
+// The notices above the list: signed out, app update, the AI question, offline, and lost Gmail access.
 import { useEffect, useState } from "react";
 import { ago } from "@/lib/inbox";
 import { APK_URL, checkAppUpdate, openedAsTab, snoozeAppUpdate } from "@/lib/app-update";
@@ -12,10 +12,11 @@ type Props = {
   savedAt: number | null;
   now: number;
   reauth: boolean;
+  signedOut?: boolean;
   signInAction?: () => Promise<void>;
 };
 
-export default function Banners({ aiConsent, onAnswerAi, offline, savedAt, now, reauth, signInAction }: Props) {
+export default function Banners({ aiConsent, onAnswerAi, offline, savedAt, now, reauth, signedOut = false, signInAction }: Props) {
   // Android app: a newer build is on GitHub (see lib/app-update.ts)
   const [appUpdate, setAppUpdate] = useState<{ installed: number; latest: number } | null>(null);
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function Banners({ aiConsent, onAnswerAi, offline, savedAt, now, 
   }, []);
 
   // #235: one banner at a time, the most important first, so the list isn't pushed off the screen
-  const which = reauth ? "reauth" : offline ? "offline" : appUpdate ? "update" : asTab ? "asTab" : aiConsent === null ? "ai" : null;
+  const which = signedOut ? "signedOut" : reauth ? "reauth" : offline ? "offline" : appUpdate ? "update" : asTab ? "asTab" : aiConsent === null ? "ai" : null;
   return (
     <>
       {which === "asTab" && (
@@ -87,6 +88,18 @@ export default function Banners({ aiConsent, onAnswerAi, offline, savedAt, now, 
           <span>
             <b>You&apos;re offline.</b> {savedAt ? `Showing your inbox from ${ago(savedAt, now)}.` : "Nothing saved on this phone yet."} Changes are paused until you&apos;re back online.
           </span>
+        </div>
+      )}
+      {which === "signedOut" && (
+        <div className="banner" role="alert">
+          <span>
+            <b>You&apos;ve been signed out.</b> New mail and changes are paused until you sign in again.
+          </span>
+          {signInAction && (
+            <form action={signInAction}>
+              <button className="pillbtn on">Sign in again</button>
+            </form>
+          )}
         </div>
       )}
       {which === "reauth" && (
