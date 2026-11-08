@@ -294,12 +294,24 @@ export async function syncUser(email: string, mode: SyncMode = "full"): Promise<
   // Only close the window when everything in it was saved (#28); otherwise the next run carries on.
   result.fetched = result.sorted; // what the app reports as "N new mails"
   const syncedAt = mode === "later" ? (user.last_synced_at ?? null) : nextSyncedAt({ previous: user.last_synced_at ?? null, startedAt, left: mailPlan.left, failed });
-  if (syncedAt !== (user.last_synced_at ?? null)) await D.db.from("users").update({ last_synced_at: syncedAt }).eq("email", email);
-  // #40: remember whether this sync had a problem, so the app can say so (separate write: older databases lack the column)
-  if (mode !== "later") await D.db.from("users").update({ last_sync_error: syncProblem(result.errors) }).eq("email", email);
-  // Separate write, so a database without the usage columns yet can't block the sync time.
-  if (!plan.own && aiUsed > 0) await D.db.from("users").update(bumpUsage(user.ai_day ?? null, user.ai_calls ?? 0, aiUsed, Date.now())).eq("email", email);
+  // #118: one write for the sync time, the problem note (#40) and AI usage, instead of one each
+  const parts = userUpdates({
+    syncedAt: syncedAt !== (user.last_synced_at ?? null) ? { last_synced_at: syncedAt } : null,
+    problem: mode !== "later" ? { last_sync_error: syncProblem(result.errors) } : null,
+    usage: !plan.own && aiUsed > 0 ? bumpUsage(user.ai_day ?? null, user.ai_calls ?? 0, aiUsed, Date.now()) : null,
+  });
+  if (parts.length) {
+    const { error: oneWrite } = await D.db.from("users").update(Object.assign({}, ...parts)).eq("email", email);
+    // An older database lacks some of these columns and refuses the whole update: then write each
+    // part on its own, sync time first, so a missing column can't block the others.
+    if (oneWrite) for (const part of parts) await D.db.from("users").update(part).eq("email", email);
+  }
   return result;
+}
+
+/** #118: the end-of-sync changes to the users row that apply this time, most important first. */
+export function userUpdates(p: { syncedAt: Record<string, unknown> | null; problem: Record<string, unknown> | null; usage: Record<string, unknown> | null }) {
+  return [p.syncedAt, p.problem, p.usage].filter((x): x is Record<string, unknown> => !!x);
 }
 
 /** #30 / #35: one sync per student at a time, at most one start every `gapSeconds`.

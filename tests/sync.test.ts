@@ -162,3 +162,44 @@ test("#85: the app's 'later' step AI-checks new mail the rules filed low but wer
   assert.ok(!checked.includes("m2"), "the confident Noise mail isn't sent to the AI");
   if (low.includes("m1")) assert.ok(checked.includes("m1"), "the unsure low mail is checked");
 });
+
+// #118: record each write to the users row (its column names); optionally refuse some columns,
+// like an older database that doesn't have them yet.
+function watchUserWrites(refuse: string[] = []) {
+  const writes: string[][] = [];
+  const from = db.from.bind(db);
+  db.from = ((t: string) => {
+    const q = from(t);
+    if (t !== "users") return q;
+    const update = q.update.bind(q);
+    q.update = ((v: Record<string, unknown>) => {
+      writes.push(Object.keys(v).sort());
+      if (Object.keys(v).some((k) => refuse.includes(k))) return { eq: async () => ({ data: null, error: { message: "column does not exist" } }) };
+      return update(v);
+    }) as typeof q.update;
+    return q;
+  }) as typeof db.from;
+  return writes;
+}
+
+test("#118: a sync ends with one write to the users row (sync time, problem note and AI usage)", async () => {
+  user().ai_consent = true;
+  user().refresh_token = "sealed-already"; // so the one-time token re-seal isn't counted
+  inbox = [msg(1, { subject: "Quick note", fromAddress: "someone@vit.ac.in", body: "Please see this." })];
+  const writes = watchUserWrites();
+  await syncUser(ME);
+  const end = writes.filter((w) => w.some((k) => ["last_synced_at", "last_sync_error", "ai_calls"].includes(k)));
+  assert.equal(end.length, 1, JSON.stringify(writes));
+  assert.ok(end[0].includes("last_synced_at") && end[0].includes("last_sync_error"));
+  assert.ok(user().last_synced_at, "the sync time is saved");
+  if (aiCalls > 0) assert.equal(user().ai_calls, aiCalls, "AI usage is saved in the same write");
+});
+
+test("#118: on a database without a newer column, the sync time is still saved", async () => {
+  user().refresh_token = "sealed-already";
+  inbox = [msg(1)];
+  const writes = watchUserWrites(["last_sync_error"]);
+  await syncUser(ME, "quick");
+  assert.ok(user().last_synced_at, "saved by the one-column fallback write");
+  assert.deepEqual(writes.at(-2), ["last_synced_at"]);
+});
