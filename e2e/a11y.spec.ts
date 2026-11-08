@@ -67,7 +67,8 @@ test.describe("keyboard only", () => {
     await page.keyboard.press("Enter");
     await dialog.getByRole("radio", { name: "Later" }).focus();
     await page.keyboard.press("Space");
-    expect(api.patches).toEqual(expect.arrayContaining([{ id: "cat1", is_done: true }, { id: "cat1", priority: "later" }]));
+    // the PATCH requests reach the fake API a moment after the key press: wait for them
+    await expect.poll(() => api.patches).toEqual(expect.arrayContaining([{ id: "cat1", is_done: true }, { id: "cat1", priority: "later" }]));
 
     // Tab stays inside the open mail
     for (let i = 0; i < 25; i++) await page.keyboard.press("Tab");
@@ -87,7 +88,7 @@ test.describe("keyboard only", () => {
     await expect(btn).toBeFocused();
     await expect(page.locator('li.row[data-mail="hack"] .row-acts')).toHaveCSS("opacity", "1");
     await page.keyboard.press("Enter");
-    expect(api.patches).toContainEqual({ id: "hack", read: true });
+    await expect.poll(() => api.patches).toContainEqual({ id: "hack", read: true });
   });
 
   test("account menu opens from the keyboard and closes with Esc", async ({ page }) => {
