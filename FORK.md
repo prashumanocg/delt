@@ -50,6 +50,19 @@ npm test
 3. Make only that change, with a test, following upstream's `CONTRIBUTING.md`.
 4. Open the PR from this fork against `pranavvehmid/delt`, referencing the issue.
 
+## Sent upstream
+| PR | Branch | Fixes |
+|---|---|---|
+| [#287](https://github.com/pranavvehmid/delt/pull/287) | `upstream/102-phone-inbox-header` | #102 (search part) |
+| [#288](https://github.com/pranavvehmid/delt/pull/288) | `upstream/schema-users-name` | fresh databases rejected sign-in (`users.name`) |
+| [#289](https://github.com/pranavvehmid/delt/pull/289) | `upstream/due-overdue-wording` | "Due overdue" wording |
+| [#290](https://github.com/pranavvehmid/delt/pull/290) | `upstream/212-undo-stack` | #212 |
+| [#291](https://github.com/pranavvehmid/delt/pull/291) | `upstream/101-mail-text-higher` | #101, part of #169 |
+| [#292](https://github.com/pranavvehmid/delt/pull/292) | `upstream/236-skip-links` | #236 (skip links, F6) |
+
+#287 and #292 both edit `inbox-app.tsx` and `base.css`; whichever merges second will need a rebase
+(the same conflict was resolved on our `main` in 0069d6c).
+
 ## Log
 Newest first. One line per change: what and why.
 
