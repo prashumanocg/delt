@@ -38,7 +38,7 @@ web-push, GitHub Actions (tests, 5-minute mail sync, Android build).
   `look-glyph.css`, `themes.css`, `look-grid.css`. `base.css` must hold no look-specific rules (a test checks).
 - `src/app/fonts/`: every font ships with the app (OFL). `src/lib/`: sorting (`rules.ts`, `classify.ts`),
   Gmail, sync, inbox helpers, attachments, prefs.
-- `tests/` unit, `e2e/` browser (`zz-*` files are local throwaways, gitignored), `docs/` notes.
+- `tests/` unit, `e2e/` browser; throwaway probes go in `e2e-scratch/` (gitignored; run with `PW_SCRATCH=1`), `docs/` notes.
 
 ## Looks and themes
 Three looks via `data-look`: `minimal` (Swiss), `glyph` (playful cards, dot-matrix titles),

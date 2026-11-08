@@ -62,6 +62,7 @@ android/local.properties
 
 # local screenshot helpers
 /e2e/zz-*.spec.ts
+/e2e-scratch/
 shots/
 
 # F1 style references: study material only, never published
