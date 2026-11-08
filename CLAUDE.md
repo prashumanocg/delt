@@ -22,9 +22,10 @@ web-push, GitHub Actions (tests, 5-minute mail sync, Android build).
 
 ## Commands
 - `npm run dev`: dev server (slow and flaky for browser tests; prefer the build)
-- `npm run build`: production build. Run it before browser tests.
+- `npm run build`: production build.
 - `npm test`: unit tests (node:test via tsx, `--conditions=react-server`)
-- `CI=1 npx playwright test --project=phone --project=desktop`: browser tests on the built app
+- `npx playwright test --project=phone --project=desktop`: builds, then runs the browser tests on the
+  built app. `CI=1` skips the build and uses the last one; `PW_DEV=1` uses the dev server.
   (`/e2e` shows the inbox with fake mail; `DELT_E2E=1`). The `iphone` (WebKit) project hangs
   on this Windows machine when animations are on; CI on Linux is the judge for it.
 - Long suites: run in the background, keep working, fix failures at the end.

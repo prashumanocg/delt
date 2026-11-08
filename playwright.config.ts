@@ -28,11 +28,13 @@ export default defineConfig({
     { name: "iphone", use: { ...devices["iPhone 15"] }, testIgnore: scratch ? [] : [SCRATCH, /a11y|layout/] },
   ],
   webServer: {
-    // CI builds first (see .github/workflows/test.yml); locally the dev server is fine.
-    command: process.env.CI ? `npx next start -p ${PORT}` : `npx next dev -p ${PORT}`,
+    // #170: always a production build. CI builds in its own step (.github/workflows/test.yml);
+    // locally a run builds first, because the dev server compiles each page on first visit and
+    // tests time out on it. PW_DEV=1 uses the dev server anyway, for a quick look at one spec.
+    command: process.env.CI ? `npx next start -p ${PORT}` : process.env.PW_DEV ? `npx next dev -p ${PORT}` : `npm run build && npx next start -p ${PORT}`,
     url: `http://localhost:${PORT}/e2e`,
     env: { DELT_E2E: "1" },
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: process.env.CI ? 180_000 : 600_000, // a local run may build first
   },
 });
