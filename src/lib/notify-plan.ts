@@ -3,7 +3,7 @@
 // - A deadline from your mail that is due within 24 hours (once per mail).
 // A few at most per run, so nobody's phone gets flooded.
 
-import { cleanSender, cleanSubject, dueText } from "./inbox";
+import { cleanSender, cleanSubject, dueLabel } from "./inbox";
 
 export const MAX_PER_RUN = 3;
 const DAY = 86400_000;
@@ -49,7 +49,7 @@ export function planNotifications(mails: NotifyMail[], now: number): Push[] {
     out.push({
       id: m.id,
       kind: "deadline",
-      title: `Due ${dueText(m.deadline!, now)}`,
+      title: dueLabel(m.deadline!, now),
       body: cleanSubject(m.subject),
       url: `/#/mail/${encodeURIComponent(m.id)}`,
       tag: `due-${m.id}`,

@@ -124,6 +124,12 @@ export function ago(t: number, now: number) {
   return `${Math.round(s / 86400)} d ago`;
 }
 
+/** The whole due label: "Overdue", or "Due " + dueText ("Due tomorrow"). Never "Due overdue". */
+export function dueLabel(iso: string, now: number) {
+  const t = dueText(iso, now);
+  return t === "overdue" ? "Overdue" : `Due ${t}`;
+}
+
 /** Due text for chips: "overdue", "today 6 pm", "tomorrow", "in 3 days", "12 Nov". */
 export function dueText(iso: string, now: number) {
   const t = Date.parse(iso);

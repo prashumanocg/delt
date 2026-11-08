@@ -3,7 +3,7 @@
 // A05: on a laptop with no mail open, the reading pane shows today at a glance instead of an empty box:
 // what's unread, what needs you, the next deadline. Every item opens its mail.
 import type { EmailRow } from "@/lib/supabase";
-import { cleanSender, cleanSubject, dueText } from "@/lib/inbox";
+import { cleanSender, cleanSubject, dueLabel } from "@/lib/inbox";
 
 type Props = { unread: number; needs: EmailRow[]; dueThisWeek: number; next: EmailRow | null; now: number; onOpen: (m: EmailRow) => void };
 
@@ -32,7 +32,7 @@ export default function Overview({ unread, needs, dueThisWeek, next, now, onOpen
             <h3 className="ov-head">Next deadline</h3>
             <button className="ov-item" onClick={() => onOpen(next)}>
               <b>{cleanSubject(next.subject)}</b>
-              <span className="ov-due">Due {dueText(next.deadline!, now)}</span>
+              <span className="ov-due">{dueLabel(next.deadline!, now)}</span>
               <span className="muted">{cleanSender(next.from_name)}</span>
             </button>
           </>

@@ -1,6 +1,7 @@
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
-import { ago, deadlineBuckets, dayLabel, dueLevel, dueText, filterMail, groupByDay, openDeadlines, pileCounts, shortTime, type Mail } from "../src/lib/inbox";
+import { ago, deadlineBuckets, dayLabel, dueLabel, dueLevel, dueText, filterMail, groupByDay, openDeadlines, pileCounts, shortTime, type Mail } from "../src/lib/inbox";
 
 // Wed 4 Nov 2026, 12:00 IST
 const NOW = Date.parse("2026-11-04T12:00:00+05:30");
@@ -82,6 +83,15 @@ test("dueText and dueLevel", () => {
   assert.equal(dueLevel(new Date(NOW + 30 * H).toISOString(), NOW), "soon");
   assert.equal(dueLevel(new Date(NOW + 100 * H).toISOString(), NOW), "week");
   assert.equal(dueLevel(new Date(NOW - H).toISOString(), NOW), "over");
+});
+
+test("dueLabel says Overdue, not \"Due overdue\"", () => {
+  assert.equal(dueLabel(new Date(NOW - H).toISOString(), NOW), "Overdue");
+  assert.match(dueLabel("2026-11-05T23:59:00+05:30", NOW), /^Due tomorrow/);
+  assert.equal(dueLabel("2026-11-20T10:00:00+05:30", NOW), "Due 20 Nov");
+  // every screen goes through dueLabel, so no "Due " + dueText(...) is left to print "Due overdue"
+  for (const f of ["src/app/mail-row.tsx", "src/app/mail-view.tsx", "src/app/overview.tsx", "src/lib/notify-plan.ts"])
+    assert.doesNotMatch(readFileSync(f, "utf8"), /Due \{dueText|Due \$\{dueText/, f);
 });
 
 test("deadlineBuckets: only from mail, no noise, repeats merged, done kept", () => {

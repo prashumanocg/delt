@@ -3,7 +3,7 @@
 // One mail row: tap to open, swipe to act.
 import { memo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import type { EmailRow } from "@/lib/supabase";
-import { cleanSender, cleanSubject, dueLevel, dueText, gapText, initials, pileLabel, senderCode, shortTime, timeOfDay } from "@/lib/inbox";
+import { cleanSender, cleanSubject, dueLevel, dueLabel, gapText, initials, pileLabel, senderCode, shortTime, timeOfDay } from "@/lib/inbox";
 import type { Look } from "./use-look";
 
 export type RowActions = { open: (m: EmailRow) => void; read: (m: EmailRow) => void; done: (m: EmailRow) => void };
@@ -61,7 +61,7 @@ export const MailRow = memo(function MailRow({ m, now, pos = 0, on, current = fa
     m.unread ? "Unread." : "",
     `${sender}: ${cleanSubject(m.subject)}.`,
     `${pileLabel(m.priority)}, ${shortTime(m.received_at, now) === timeOfDay(m.received_at) ? "today" : shortTime(m.received_at, now)} at ${timeOfDay(m.received_at)}.`,
-    m.deadline && !m.is_done ? `Due ${dueText(m.deadline, now)}.` : "",
+    m.deadline && !m.is_done ? `${dueLabel(m.deadline, now)}.` : "",
     m.is_done ? "Done." : "",
   ].filter(Boolean).join(" ");
 
@@ -122,7 +122,7 @@ export const MailRow = memo(function MailRow({ m, now, pos = 0, on, current = fa
                   {pileLabel(m.priority)}
                 </span>
               )}
-              {m.deadline && !m.is_done && <span className={`due lv-${dueLevel(m.deadline, now)}`}>Due {dueText(m.deadline, now)}</span>}
+              {m.deadline && !m.is_done && <span className={`due lv-${dueLevel(m.deadline, now)}`}>{dueLabel(m.deadline, now)}</span>}
               {m.is_done && <span className="donemark">✓ Done</span>}
             </span>
             )}

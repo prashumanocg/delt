@@ -8,7 +8,7 @@ import type { FullMessage } from "@/lib/gmail";
 import MailFrame from "./mail-frame";
 import MailAttachments from "./mail-attachments";
 import { listedFiles } from "@/lib/attachments";
-import { F, PILES, cleanSender, cleanSubject, dueLevel, dueText, pileLabel, senderDomain, wrongPileLink } from "@/lib/inbox";
+import { F, PILES, cleanSender, cleanSubject, dueLevel, dueLabel, pileLabel, senderDomain, wrongPileLink } from "@/lib/inbox";
 import { calendarLink } from "@/lib/insights";
 import { useDialog } from "./use-dialog";
 
@@ -166,7 +166,7 @@ export default function MailView({
           {row?.deadline && (
             <div className={`mv-due lv-${dueLevel(row.deadline, now)}`}>
               <span>
-                <b>Due {dueText(row.deadline, now)}</b>
+                <b>{dueLabel(row.deadline, now)}</b>
                 <span className="muted"> · {F.dueFull.format(new Date(row.deadline))}</span>
               </span>
               <a className="pillbtn" href={calendarLink(subject, row.deadline, row.summary)} target="_blank" rel="noreferrer">+ Calendar</a>
