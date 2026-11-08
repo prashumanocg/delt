@@ -215,6 +215,26 @@ test("the DELT logo is the same Minimal wordmark in every look and theme", async
 
 test.describe("with animations on", () => {
   test.use({ contextOptions: { reducedMotion: "no-preference" } });
+  test("a second change during an animation doesn't raise an error (skipped transition)", async ({ page }) => {
+    await mockApi(page, smallInbox());
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto("/e2e");
+    const panel = await openPanel(page);
+    // two theme changes in the same instant: the second view transition skips the first
+    const clicked = await panel.evaluate((el) => {
+      const radio = (name: string) => [...el.querySelectorAll<HTMLElement>('[role="radio"]')].find((r) => r.textContent?.trim() === name);
+      const [dark, light] = [radio("Dark"), radio("Light")];
+      dark?.click();
+      light?.click();
+      return !!dark && !!light;
+    });
+    expect(clicked).toBe(true);
+    await expect(html(page)).toHaveAttribute("data-theme", "light");
+    await page.waitForTimeout(500);
+    expect(errors).toEqual([]);
+  });
+
   test("opening and closing a mail, a panel, and switching theme all still work", async ({ page }) => {
     await mockApi(page, smallInbox());
     const errors: string[] = [];
