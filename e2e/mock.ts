@@ -1,6 +1,6 @@
 // Fake mail and a fake API for the browser tests. Every /api call the app makes is answered here,
 // so the tests never need a Google account, Supabase or the internet.
-import type { Page, Request } from "@playwright/test";
+import { expect, type Page, type Request } from "@playwright/test";
 
 export type FakeMail = {
   id: string;
@@ -200,6 +200,14 @@ export async function mockApi(page: Page, mails: FakeMail[], opts: { reauth?: bo
     return route.fulfill(json({ error: `not mocked: ${method} ${path}` }, 500));
   });
   return api;
+}
+
+/** The search box. On a phone it is folded into the top bar's search button until opened (#102). */
+export async function searchBox(page: Page) {
+  const box = page.getByRole("textbox", { name: "Search mail" });
+  if (!(await box.isVisible())) await page.getByRole("button", { name: "Search mail" }).click();
+  await expect(box).toBeVisible();
+  return box;
 }
 
 /** Drags a mail row sideways like a finger would (the app ignores mouse drags on purpose). */

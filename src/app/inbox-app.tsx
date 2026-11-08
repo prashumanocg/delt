@@ -19,7 +19,7 @@ import Banners from "./banners";
 import DeadlinesList from "./deadlines-list";
 import Overview from "./overview";
 import { LoadError } from "./list-states";
-import InboxList, { SearchBox, type Filters } from "./inbox-list";
+import InboxList, { SearchBox, SearchIcon, type Filters } from "./inbox-list";
 import type { RowActions } from "./mail-row";
 import { TabBar, TopTabs } from "./tabs";
 import { Toast, useToast } from "./toast";
@@ -47,6 +47,7 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
   const canHover = useCanHover();
   const [settingsSection, setSettingsSection] = useState<"data" | "rules" | undefined>();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false); // #102: phones only
   const { findMail, patch, markAllRead, answerAi } = useMailActions({ ...data, hits, setHits, say: setToast });
 
   const loudSync = useCallback(() => sync(true), [sync]);
@@ -143,6 +144,21 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
     const waiting = needsAll.filter((m) => m.unread).length;
     document.title = open ? `${cleanSubject(open.subject)} · DELT` : waiting ? `(${waiting}) DELT` : "DELT";
   }, [open, needsAll]);
+  // #102: on a phone search waits behind this button, so the list starts higher
+  const searchButton = (
+    <button
+      className="iconbtn searchbtn"
+      aria-label="Search mail"
+      aria-expanded={searchOpen || !!query}
+      onClick={() => {
+        if (route.tab !== "inbox") goTab("inbox");
+        setSearchOpen(true);
+        document.getElementById("search")?.focus();
+      }}
+    >
+      <SearchIcon />
+    </button>
+  );
   const gmailHome = `https://mail.google.com/mail/?authuser=${encodeURIComponent(email)}`;
   const { syncProblem } = data;
 
@@ -176,6 +192,7 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
           <span>{backlog > 0 ? "Bringing in older mail…" : syncing ? "Checking…" : syncProblem ? "Last check had a problem" : syncedAt ? `Updated ${ago(syncedAt, now)}` : "Check for mail"}</span>
         </button>
         <div className="appbar-r">
+          {!wide && look !== "minimal" && searchButton}
           <Appearance />
           <AccountMenu name={name} email={email} signOutAction={signOutAction} onSettings={openSettings} />
         </div>
@@ -188,7 +205,16 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
           <span>{pull >= PULL_AT ? "Release to check for mail" : "Pull to check for mail"}</span>
         </div>
       )}
-      {!wide && <TopTabs tab={route.tab} unread={badge} dueCount={dueCount} />}
+      {/* #102: Minimal's top bar is full (its status text is in spaced capitals), but its section titles leave room
+          for search; Glyph (no titles on a phone) and Grid (titles fill the row) keep it in the top bar */}
+      {!wide && (look !== "minimal" ? (
+        <TopTabs tab={route.tab} unread={badge} dueCount={dueCount} />
+      ) : (
+        <div className="mastrow">
+          <TopTabs tab={route.tab} unread={badge} dueCount={dueCount} />
+          {searchButton}
+        </div>
+      ))}
 
       {mails === null && loadError && (
         <main className="page">
@@ -220,6 +246,8 @@ export default function InboxApp({ email, name, signOutAction, signInAction }: P
           look={look}
           hover={canHover}
           searchInBar={wide}
+          searchOpen={searchOpen}
+          onCloseSearch={() => setSearchOpen(false)}
         />
       )}
       {route.tab === "deadlines" && !(mails === null && loadError) && <DeadlinesList key="deadlines" loaded={mails !== null} buckets={buckets} now={now} onOpen={(m) => openMail(m)} onPatch={(id, p) => patch(id, p)} />}

@@ -34,17 +34,41 @@ type Props = {
   hover: boolean;
   /** #76: on wide screens search sits in the top bar instead */
   searchInBar?: boolean;
+  /** #102: on phones search is folded into a top-bar button until opened (or holding a search) */
+  searchOpen?: boolean;
+  onCloseSearch?: () => void;
 };
 
 // #77: two screens of rows on a phone or laptop; the rest follow in a pausable render
 const FIRST_ROWS = 12;
 
-export function SearchBox({ query, onChange }: { query: string; onChange: (q: string) => void }) {
+export const SearchIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm5-2 5 5" /></svg>;
+
+/** `onClose` (phones, #102): the box was opened from the top bar's search button and folds away
+ *  again when it's empty and loses focus, on Esc, or when it's cleared. */
+export function SearchBox({ query, onChange, onClose }: { query: string; onChange: (q: string) => void; onClose?: () => void }) {
   return (
     <label className="searchbar">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm5-2 5 5" /></svg>
-      <input value={query} onChange={(e) => onChange(e.target.value)} placeholder="Search mail" aria-label="Search mail" />
-      {query && <button onClick={() => onChange("")} aria-label="Clear search">✕</button>}
+      <SearchIcon />
+      <input
+        id={onClose ? "search" : undefined}
+        value={query}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search mail"
+        aria-label="Search mail"
+        autoFocus={!!onClose}
+        onBlur={() => !query && onClose?.()}
+        onKeyDown={(e) => {
+          if (e.key === "Escape" && onClose) {
+            onChange("");
+            onClose();
+          }
+        }}
+      />
+      {query && (
+        // keeps focus in the box, so clearing doesn't count as leaving it
+        <button onMouseDown={(e) => e.preventDefault()} onClick={() => { onChange(""); onClose?.(); }} aria-label="Clear search">✕</button>
+      )}
     </label>
   );
 }
@@ -112,7 +136,7 @@ export default function InboxList(p: Props) {
 
   return (
     <main className="page">
-      {!p.searchInBar && <SearchBox query={query} onChange={(q) => setFilters({ query: q })} />}
+      {!p.searchInBar && (p.searchOpen || query) && <SearchBox query={query} onChange={(q) => setFilters({ query: q })} onClose={p.onCloseSearch} />}
 
       <nav className="chips" aria-label="Filter by pile" ref={chipsMount} onScroll={chipsMore}>
         {(["all", ...PILES.map((p) => p.key)] as const).map((k) => (

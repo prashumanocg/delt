@@ -1,6 +1,6 @@
 // Issue #12: the main screens in a real browser, with fake mail (see mock.ts).
 import { expect, test } from "@playwright/test";
-import { bigInbox, mockApi, smallInbox, swipe } from "./mock";
+import { bigInbox, mockApi, searchBox, smallInbox, swipe } from "./mock";
 
 const row = (id: string) => `li.row[data-mail="${id}"]`;
 
@@ -112,7 +112,7 @@ test("a busy inbox loads older mail on scroll, and search finds mail that isn't 
   await page.evaluate(() => scrollTo(0, 0));
   await page.reload();
   await expect(page.locator("li.row")).toHaveCount(200);
-  await page.getByRole("textbox", { name: "Search mail" }).fill("scholarship");
+  await (await searchBox(page)).fill("scholarship");
   await expect(page.locator(row("ancient"))).toBeVisible();
   expect(api.emailRequests.some((s) => s.includes("q=scholarship"))).toBe(true);
   await page.getByRole("button", { name: "Clear search" }).click();
@@ -192,7 +192,7 @@ test("iPhone: tapping search doesn't zoom the page, and nothing scrolls sideways
   test.skip(!isMobile, "phone screens only");
   await mockApi(page, smallInbox());
   await page.goto("/e2e");
-  const box = page.getByRole("textbox", { name: "Search mail" });
+  const box = await searchBox(page);
   expect(await box.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   await page.locator(row("cat1")).locator(".row-main").click();
@@ -293,7 +293,7 @@ test("All starts with what needs you: due soon first, then unread urgent; not sh
   await page.getByRole("navigation", { name: "Filter by pile" }).getByRole("button", { name: /^Urgent/ }).click();
   await expect(needs).toHaveCount(0);
   await page.getByRole("navigation", { name: "Filter by pile" }).getByRole("button", { name: /^All/ }).click();
-  await page.getByRole("textbox", { name: "Search mail" }).fill("hostel");
+  await (await searchBox(page)).fill("hostel");
   await expect(needs).toHaveCount(0);
 });
 
@@ -448,7 +448,7 @@ test("an empty search says what was searched and offers to widen it; matches are
   await mockApi(page, smallInbox());
   await page.goto("/e2e");
   await page.getByRole("navigation", { name: "Filter by pile" }).getByRole("button", { name: /^Noise/ }).click();
-  await page.getByRole("textbox", { name: "Search mail" }).fill("hostel");
+  await (await searchBox(page)).fill("hostel");
   await expect(page.getByText("Nothing matches “hostel” in Noise")).toBeVisible();
   await page.getByRole("button", { name: "Search all piles" }).click();
   await expect(page.locator(row("fee"))).toBeVisible();
@@ -518,4 +518,36 @@ test("a sheet over the reading pane: Esc closes only the sheet, and J/K wait (#4
   await expect(dialog).toHaveCount(0);
   await expect(page.locator(".mailview.pane")).toBeVisible();
   await expect(page.locator("#mv-title")).toHaveText(title!);
+});
+
+test("on a phone, search waits behind a top-bar button so the list starts higher (#102)", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "phone screens only; laptops keep search in the top bar");
+  await mockApi(page, smallInbox());
+  await page.goto("/e2e");
+  const box = page.getByRole("textbox", { name: "Search mail" });
+  const button = page.getByRole("button", { name: "Search mail" });
+  await expect(page.locator(row("cat1"))).toBeVisible();
+  await expect(box).toHaveCount(0);
+  await expect(button).toHaveAttribute("aria-expanded", "false");
+
+  // opening puts the cursor straight in the box
+  await button.click();
+  await expect(box).toBeFocused();
+  await expect(button).toHaveAttribute("aria-expanded", "true");
+
+  // Esc folds it away again; so does tapping elsewhere while it's empty
+  await page.keyboard.press("Escape");
+  await expect(box).toHaveCount(0);
+  await button.click();
+  await page.locator("main").click({ position: { x: 4, y: 4 } });
+  await expect(box).toHaveCount(0);
+
+  // a search in progress keeps it open, and clearing closes it
+  await button.click();
+  await box.fill("hostel");
+  await page.locator("main").click({ position: { x: 4, y: 4 } });
+  await expect(box).toBeVisible();
+  await page.getByRole("button", { name: "Clear search" }).click();
+  await expect(box).toHaveCount(0);
+  await expect(page.locator(row("cat1"))).toBeVisible();
 });

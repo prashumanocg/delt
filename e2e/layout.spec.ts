@@ -1,6 +1,6 @@
 // #67–#70: the layout is measured, not eyeballed. Edges, baselines and sizes that should match do.
 import { expect, test, type Page } from "@playwright/test";
-import { mockApi, smallInbox } from "./mock";
+import { mockApi, searchBox, smallInbox } from "./mock";
 
 const LOOKS = ["minimal", "glyph", "grid"] as const;
 
@@ -28,6 +28,7 @@ const near = (a: number, b: number, what: string, tol = 1) => expect(Math.abs(a 
 for (const look of LOOKS) {
   test(`${look}: header, search and rows share the same left and right edges (#67)`, async ({ page }) => {
     await open(page, look);
+    await searchBox(page); // #102: on a phone, open it from the top bar first
     const [logo, search, avatar, row] = await Promise.all([box(page, ".logo"), box(page, ".searchbar"), box(page, ".avatar.me"), box(page, "li.row")]);
     const width = await page.evaluate(() => innerWidth);
     if (width >= 1000) {
@@ -230,6 +231,7 @@ test("Minimal: day headings and sender names don't share a style (#69)", async (
 // #70: small details
 test("the icons in the header and search bar are one size (#70)", async ({ page }) => {
   await open(page, "minimal");
+  await searchBox(page);
   const sizes = await page.locator(".appbar svg:visible, .searchbar svg:visible").evaluateAll((s) => [...new Set(s.map((e) => Math.round(e.getBoundingClientRect().width)))]);
   expect(sizes).toEqual([20]);
 });
