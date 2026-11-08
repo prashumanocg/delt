@@ -53,6 +53,7 @@ npm test
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-08 Merged `upstream/236-skip-links`: skip buttons and F6 between list and mail (#236). Meant for upstream.
 - 2026-11-08 Merged `upstream/101-mail-text-higher`: report link under the mail, Summary on one line; mail text ~80px higher on phones (#101). Meant for upstream.
 - 2026-11-08 Merged `upstream/212-undo-stack`: Undo history, so a second action no longer drops the first Undo (#212). Meant for upstream.
 - 2026-11-08 Merged `upstream/due-overdue-wording`: missed deadlines said "Due overdue". Meant for upstream.
