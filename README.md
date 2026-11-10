@@ -1,3 +1,5 @@
+> **Fork note:** this is a personal fork of [pranavvehmid/delt](https://github.com/pranavvehmid/delt) with a few changes of my own (a refined dark theme, for now). What differs and why: [FORK.md](FORK.md). For the real app, issues and releases, go upstream.
+
 <p align="center">
   <img src="assets/banner.svg" alt="DELT: college mail, sorted by what needs you first" width="100%">
 </p>

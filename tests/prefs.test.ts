@@ -94,7 +94,7 @@ test("Extra dark paints the phone's status bar black before the app loads (#26)"
     assert.deepEqual(run({ look, mode: "black" }), [{ content: "#000000" }, { content: "#000000" }]);
   }
   assert.equal(run({ look: "minimal", mode: "light" })[0].content, "#fafaf9");
-  assert.equal(run({ look: "minimal", mode: "dark" })[0].content, "#161412");
+  assert.equal(run({ look: "minimal", mode: "dark" })[0].content, "#0d0e10");
 });
 
 test("Grid (F1-inspired) is always dark, and only offers its own driver colours", () => {

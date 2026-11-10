@@ -7,10 +7,12 @@
    2. look-shared: what Minimal and Grid share (Grid is built on Minimal's layout)
    3. look-minimal, look-glyph: each look's own rules
    4. themes: Extra dark, accents, text size, spacing (win over a look's defaults)
-   5. look-grid: last, so Grid keeps its own colours and type over the shared rules */
+   5. look-grid: so Grid keeps its own colours and type over the shared rules
+   6. look-slate: this fork's refinement of Minimal dark (FORK.md), last so it wins */
 @import "./styles/base.css";
 @import "./styles/look-shared.css";
 @import "./styles/look-minimal.css";
 @import "./styles/look-glyph.css";
 @import "./styles/themes.css";
 @import "./styles/look-grid.css";
+@import "./styles/look-slate.css";
