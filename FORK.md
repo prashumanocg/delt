@@ -131,6 +131,7 @@ and `layout.spec.ts:102` (#67 Back arrow, phone).
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-10 Built `upstream/all-fixes` (every upstream fix in one branch, 305 browser tests pass) and `custom/fork-only` (only this fork's changes). Link to open the combined PR is at the top of FORK-PRS.md.
 - 2026-11-10 #293–#305 opened upstream in one batch (rows 1–13). GitHub suspended the account right after (probably the burst of automated PRs); Support restored it. From now on: at most 3 of ours open at once, no bulk opening.
 - 2026-11-08 Merged 15 upstream branches (#185, #180, #171, #149, #182, #121, #170, #165, #152, #150, #106, #119, #118, a flaky keyboard test, skipped view transitions). PRs queued in FORK-PRS.md (pace limit). #121 and #106 need their new SQL run on this fork's database too.
 - 2026-11-08 Ranked upstream's 168 open issues in "Upstream queue".
