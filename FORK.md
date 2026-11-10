@@ -59,6 +59,19 @@ npm test
 | [#290](https://github.com/pranavvehmid/delt/pull/290) | `upstream/212-undo-stack` | #212 |
 | [#291](https://github.com/pranavvehmid/delt/pull/291) | `upstream/101-mail-text-higher` | #101, part of #169 |
 | [#292](https://github.com/pranavvehmid/delt/pull/292) | `upstream/236-skip-links` | #236 (skip links, F6) |
+| [#293](https://github.com/pranavvehmid/delt/pull/293) | `upstream/185-package-name` | #185 |
+| [#294](https://github.com/pranavvehmid/delt/pull/294) | `upstream/180-test-badge` | #180 |
+| [#295](https://github.com/pranavvehmid/delt/pull/295) | `upstream/171-scratch-specs` | #171 |
+| [#296](https://github.com/pranavvehmid/delt/pull/296) | `upstream/149-search-abort` | #149 |
+| [#297](https://github.com/pranavvehmid/delt/pull/297) | `upstream/182-design-code-map` | #182 |
+| [#298](https://github.com/pranavvehmid/delt/pull/298) | `upstream/121-sync-indexes` | #121 |
+| [#299](https://github.com/pranavvehmid/delt/pull/299) | `upstream/170-e2e-on-build` | #170 |
+| [#300](https://github.com/pranavvehmid/delt/pull/300) | `upstream/165-row-clock` | #165 |
+| [#301](https://github.com/pranavvehmid/delt/pull/301) | `upstream/152-signed-out-banner` | #152 |
+| [#302](https://github.com/pranavvehmid/delt/pull/302) | `upstream/150-sync-error-words` | #150 |
+| [#303](https://github.com/pranavvehmid/delt/pull/303) | `upstream/106-later-lock` | #106 |
+| [#304](https://github.com/pranavvehmid/delt/pull/304) | `upstream/119-last-seen` | #119 |
+| [#305](https://github.com/pranavvehmid/delt/pull/305) | `upstream/118-one-user-write` | #118 |
 
 #287 and #292 both edit `inbox-app.tsx` and `base.css`; whichever merges second will need a rebase
 (the same conflict was resolved on our `main` in 0069d6c).
@@ -105,8 +118,9 @@ when the open count drops below 3.
 | 237–286 | feature ideas | | skip | none is tiny |
 
 ## PRs waiting to be sent
-15 branches, each pushed to this fork with a pre-filled PR link in [FORK-PRS.md](FORK-PRS.md).
-Open them oldest first when fewer than 3 of ours are open upstream. FORK-PRS.md also lists where they overlap.
+2 branches left (the flaky keyboard test and skipped view transitions), with pre-filled links in
+[FORK-PRS.md](FORK-PRS.md). Send them only when fewer than 3 of ours are open upstream.
+FORK-PRS.md also lists where the sent PRs overlap.
 
 Found while testing (not on the issue list): upstream's keyboard test reads `api.patches` before the
 PATCH arrives (fails 10/40 runs here), and `transition()` lets a skipped view transition throw
@@ -117,6 +131,7 @@ and `layout.spec.ts:102` (#67 Back arrow, phone).
 ## Log
 Newest first. One line per change: what and why.
 
+- 2026-11-10 #293–#305 opened upstream in one batch (rows 1–13). GitHub suspended the account right after (probably the burst of automated PRs); Support restored it. From now on: at most 3 of ours open at once, no bulk opening.
 - 2026-11-08 Merged 15 upstream branches (#185, #180, #171, #149, #182, #121, #170, #165, #152, #150, #106, #119, #118, a flaky keyboard test, skipped view transitions). PRs queued in FORK-PRS.md (pace limit). #121 and #106 need their new SQL run on this fork's database too.
 - 2026-11-08 Ranked upstream's 168 open issues in "Upstream queue".
 - 2026-11-08 Merged `upstream/236-skip-links`: skip buttons and F6 between list and mail (#236). Meant for upstream.
