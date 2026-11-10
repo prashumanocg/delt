@@ -74,7 +74,7 @@ npm test
 | [#305](https://github.com/pranavvehmid/delt/pull/305) | `upstream/118-one-user-write` | #118 |
 
 #287 and #292 both edit `inbox-app.tsx` and `base.css`; whichever merges second will need a rebase
-(the same conflict was resolved on our `main` in 0069d6c).
+(the same conflict was resolved on our `main` in cb856f3).
 
 ## Upstream queue
 Triaged 2026-11-08 from the 168 open issues on pranavvehmid/delt. Upstream `main` was still at
